@@ -8,6 +8,7 @@ from typing import List
 
 
 def sum_list(input_list: List[float]) -> float:
+    """return the sum of all list elelments"""
     length: int
     sum: float
     length = len(input_list)
