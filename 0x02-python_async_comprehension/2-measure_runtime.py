@@ -21,7 +21,7 @@ async def measure_runtime() -> float:
         tasks.append(task)
 
     finals: List[List[float]] = await asyncio.gather(*tasks)
-    end: float =time.time()
+    end: float = time.time()
 
     runtime: float = end - start
     return runtime

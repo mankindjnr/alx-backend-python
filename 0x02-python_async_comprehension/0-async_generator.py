@@ -16,4 +16,3 @@ async def async_generator() -> AsyncGenerator[float, None]:
         await asyncio.sleep(1)
         number: float = random.uniform(0, 10)
         yield(number)
-
