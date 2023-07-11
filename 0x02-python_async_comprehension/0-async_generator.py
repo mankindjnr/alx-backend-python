@@ -2,7 +2,7 @@
 """
 a coroutine that takes no arguments
 """
-from typing import List, AsyncGenerator
+from typing import AsyncGenerator
 import asyncio
 import random
 
