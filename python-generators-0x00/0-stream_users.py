@@ -1,31 +1,26 @@
+import psycopg2
 seed = __import__('seed')
 
-def stream_users(connection):
+def stream_users():
     """
-    stream rows from an sql database
+    Streams rows from the 'user_data' table one by one using a generator.
     """
-    cursor = connection.cursor()
-    cursor.execute(f"SELECT * FROM user_data;")
-    row = cursor.fetchone()
+    connection = seed.connect_to_prodev()  # Establish connection to the database
 
-    while row:
-        yield row
-        row = cursor.fetchone()
-
-    cursor.close()
-    connection.close()
-
-def main():
-    connection = seed.connect_db()
-    if connection:
-        seed.create_database(connection)
+    try:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM user_data;")
+        
+        # Fetch and yield rows one by one using a while loop
+        while True:
+            row = cursor.fetchone()  # Fetch the next row
+            if row is None:
+                break  # Exit the loop when no rows are left
+            yield row  # Yield the current row
+    except Exception as e:
+        print(f"Error streaming users: {e}")
+    finally:
+        cursor.close()
         connection.close()
-        print(f"connection successful")
 
-        connection = seed.connect_to_prodev()
-
-        if connection:
-            return stream_users(connection)
-
-if __name__ == "__main__":
-    main()
+stream_users()
