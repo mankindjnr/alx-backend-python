@@ -1,11 +1,26 @@
 import psycopg2
-seed = __import__('seed')
+def connect_to_prodev():
+    """
+    Connects to the 'ALX_prodev' database.
+    """
+    try:
+        connection = psycopg2.connect(
+            dbname="ALX_prodev",
+            user="alx",
+            password="alx",
+            host="localhost",
+            port="5432"
+        )
+        return connection
+    except psycopg2.Error as e:
+        print(f"Error connecting to ALX_prodev database: {e}")
+        return None
 
 def stream_users():
     """
     Streams rows from the 'user_data' table one by one using a generator.
     """
-    connection = seed.connect_to_prodev()  # Establish connection to the database
+    connection = connect_to_prodev()  # Establish connection to the database
 
     try:
         cursor = connection.cursor()
@@ -23,4 +38,8 @@ def stream_users():
         cursor.close()
         connection.close()
 
-stream_users()
+if __name__ == "__main__":
+    # Iterate over the generator function and print only the first 6 rows
+    from itertools import islice
+    for user in islice(stream_users(), 6):
+        print(user)
