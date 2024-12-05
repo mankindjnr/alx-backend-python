@@ -4,7 +4,7 @@ from datetime import datetime
 
 def log_queries():
     """
-    A decorator to log SQL queries before executing them.
+    This decorator will log SQL queries before executing them.
     """
     def decorator(func):
         @functools.wraps(func)
@@ -31,12 +31,3 @@ def fetch_all_users(query):
     results = cursor.fetchall()
     conn.close()
     return results
-
-# Fetch users while logging the query
-users = fetch_all_users(query="SELECT * FROM users")
-
-# Display the fetched users
-print("Fetched Users:")
-for user in users:
-    print(user)
-

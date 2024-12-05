@@ -1,30 +1,30 @@
 import sqlite3
 import functools
 
-# Global dictionary to store cached query results
+# this is a global dictionary to store cached query results
 query_cache = {}
 
 def cache_query(func):
     """
     A decorator that caches the results of a database query.
-    Caches are keyed by the SQL query string.
+    The Caches are keyed by the SQL query string.
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        query = kwargs.get('query') or args[1]  # Extract query from args or kwargs
+        query = kwargs.get('query') or args[1]  # Get the query string
         if query in query_cache:
             print("Fetching result from cache...")
-            return query_cache[query]  # Return cached result
+            return query_cache[query]  # Return the cached result
         print("Querying database and caching result...")
         result = func(*args, **kwargs)  # Execute the function
-        query_cache[query] = result  # Cache the result
+        query_cache[query] = result  # Caching the result
         return result
     return wrapper
 
 def with_db_connection(func):
     """
     A decorator that handles opening and closing a database connection.
-    It passes the connection object to the decorated function.
+    It will pass the connection object to the decorated function.
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -46,11 +46,3 @@ def fetch_users_with_cache(conn, query):
     cursor = conn.cursor()
     cursor.execute(query)
     return cursor.fetchall()
-
-# First call will cache the result
-users = fetch_users_with_cache(query="SELECT * FROM users")
-print(users)
-
-# Second call will use the cached result
-users_again = fetch_users_with_cache(query="SELECT * FROM users")
-print(users_again)
