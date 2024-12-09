@@ -96,6 +96,3 @@ def test_memoize():
     assert my_object.a_method == 42
 
 # test_utils.py"""
-nested_map={"a": {"b": 2}}
-path=("a", "b")
-print(access_nested_map(nested_map, path))
