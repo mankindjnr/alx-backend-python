@@ -3,7 +3,7 @@ from .models import User, Conversation, Message
 
 class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
-    email = serializers.CharField(validators=[self.validate_email])
+    email = serializers.CharField(validators=['validate_email'])
 
     class Meta:
         model = User

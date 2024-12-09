@@ -5,6 +5,7 @@ from .models import Conversation, User, Message
 from .serializers import ConversationSerializer, MessageSerializer
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework_nested.routers import NestedDefaultRouter
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()

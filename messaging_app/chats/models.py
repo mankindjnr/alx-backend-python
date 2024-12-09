@@ -1,5 +1,6 @@
 from django.db import models
 import uuid
+from django.conf import settings
 from django.contrib.auth.models import User, AbstractUser
 
 class User(AbstractUser):
@@ -10,7 +11,7 @@ class User(AbstractUser):
     )
     # override default fields from abstract user
     first_name = models.CharField(max_length=255, null=False, blank=False)
-    last_name = models.CharFiled(max_length=255, null=False, blank=False)
+    last_name = models.CharField(max_length=255, null=False, blank=False)
     email = models.EmailField(unique=True, null=False, blank=False, db_index=True)
 
     # custome fields
