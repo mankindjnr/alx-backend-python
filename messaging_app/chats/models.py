@@ -87,7 +87,7 @@ class Message(models.Model):
     # Message content
     message_body = models.TextField(blank=False, null=False)
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    sent_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Message {self.message_id} from {self.sender} in {self.conversation}"
