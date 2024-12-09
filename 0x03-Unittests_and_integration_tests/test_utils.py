@@ -40,7 +40,8 @@ class TestGetJson(unittest.TestCase):
     @patch("utils.requests.get")
     def test_get_json(self, test_url, test_payload, mock_get):
         """Test get_json returns the expected result."""
-        # Configure the mock to return a mock response with the desired JSON payload
+        # Configure the mock to return a mock response with
+        # the desired JSON payload
         mock_response = MagicMock()
         mock_response.json.return_value = test_payload
         mock_get.return_value = mock_response
@@ -49,7 +50,8 @@ class TestGetJson(unittest.TestCase):
         result = get_json(test_url)
 
         # Assertions
-        mock_get.assert_called_once_with(test_url)  # Ensure requests.get was called once with the test_url
+        # Ensure requests.get was called once with the test_url
+        mock_get.assert_called_once_with(test_url)
         self.assertEqual(result, test_payload)
 
 
@@ -68,9 +70,10 @@ class TestMemoize(unittest.TestCase):
             def a_property(self):
                 return self.a_method()
 
-        with patch.object(TestClass, 'a_method', return_value=42) as mock_method:
+        with patch.object(TestClass, 'a_method',
+        return_value=42) as mock_method:
             obj = TestClass()
-            
+
             # Call the property twice
             self.assertEqual(obj.a_property, 42)
             self.assertEqual(obj.a_property, 42)
