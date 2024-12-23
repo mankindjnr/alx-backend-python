@@ -6,12 +6,18 @@ from .serializers import ConversationSerializer, MessageSerializer
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_nested.routers import NestedDefaultRouter
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsOwnerOrParticipant
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrParticipant]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['participants']
+
+    def get_queryset(self):
+        return Conversation.objects.filter(participants=self.request.user)
 
     def create(self, request, *args, **kwargs):
         """
@@ -39,8 +45,12 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrParticipant]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['conversation']
+
+    def get_queryset(self):
+        return Message.objects.filter(conversation__participants=self.request.user)
 
     def create(self, request, *args, **kwargs):
         """
