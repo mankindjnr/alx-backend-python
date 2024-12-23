@@ -42,12 +42,16 @@ class ConversationViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(conversation)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+class MessagePagination(PageNumberPagination):
+    page_size = 20
+
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated, IsParticipantOfConversation]
+    pagination_class = MessagePagination
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['conversation']
+    filterset_fields = MessageFilter
 
     def get_queryset(self):
         return self.queryset.filter(conversation__participants=self.request.user)
