@@ -8,4 +8,7 @@ class MessageFilter(django_filters.FilterSet):
 
     class Meta:
         model = Message
-        fields = ["user", "start_date", "end_date"]
+        fields = {
+            "sender": ["exact"],
+            "sent_at": ["gte", "lte"],
+        }
