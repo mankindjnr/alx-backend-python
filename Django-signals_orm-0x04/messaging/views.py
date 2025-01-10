@@ -10,6 +10,45 @@ def delete_user(request):
     messages.success(request, "Your account and related data have been deleted.")
     return redirect("home")
 
+@method_decorator(csrf_exempt, name="dispatch")
+@login_required
+def create_message(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        receiver_username = data.get("receiver")
+        content = data.get("content")
+        parent_message_id = data.get("parent_message")  # Optional for threaded replies
+
+        try:
+            receiver = User.objects.get(username=receiver_username)
+        except User.DoesNotExist:
+            return JsonResponse({"error": "Receiver not found."}, status=404)
+
+        parent_message = None
+        if parent_message_id:
+            try:
+                parent_message = Message.objects.get(id=parent_message_id)
+            except Message.DoesNotExist:
+                return JsonResponse({"error": "Parent message not found."}, status=404)
+
+        # Create the message
+        message = Message.objects.create(
+            sender=request.user,
+            receiver=receiver,
+            content=content,
+            parent_message=parent_message,
+        )
+        return JsonResponse({
+            "id": str(message.id),
+            "sender": message.sender.username,
+            "receiver": message.receiver.username,
+            "content": message.content,
+            "timestamp": message.timestamp.isoformat(),
+            "parent_message": str(parent_message.id) if parent_message else None,
+        }, status=201)
+
+    return JsonResponse({"error": "Invalid HTTP method."}, status=405)
+
 
 def get_conversation(request, message_id):
     """
