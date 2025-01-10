@@ -99,3 +99,29 @@ def fetch_all_replies(message_id):
 
     fetch_replies(message_id)
     return all_replies
+
+@login_required
+def unread_messages(request):
+    unread = Message.unread_messages.for_user(request.user)
+    messages_data = [
+        {
+            "id": message.id,
+            "sender": message.sender.username,
+            "content": message.content,
+            "timestamp": message.timestamp.isoformat(),
+        }
+        for message in unread
+    ]
+    return JsonResponse({"unread_messages": messages_data})
+
+
+@csrf_exempt
+@login_required
+def mark_as_read(request, message_id):
+    try:
+        message = Message.objects.get(id=message_id, receiver=request.user)
+        message.read = True
+        message.save()
+        return JsonResponse({"success": True, "message": "Message marked as read."})
+    except Message.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Message not found or unauthorized access."}, status=404)
