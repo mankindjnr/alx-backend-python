@@ -45,3 +45,18 @@ def fetch_threaded_replies(message):
             "replies": fetch_threaded_replies(reply),  # Recursively fetch replies
         })
     return result
+
+def fetch_all_replies(message_id):
+    """
+    Fetch all replies to a message recursively using Django ORM.
+    """
+    all_replies = []
+
+    def fetch_replies(parent_message):
+        replies = Message.objects.filter(parent_message=parent_message).select_related("sender", "receiver")
+        for reply in replies:
+            all_replies.append(reply)
+            fetch_replies(reply)
+
+    fetch_replies(message_id)
+    return all_replies
