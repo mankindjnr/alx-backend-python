@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators.cache import cache_page
 
 @login_required
 def delete_user(request):
@@ -125,3 +126,23 @@ def mark_as_read(request, message_id):
         return JsonResponse({"success": True, "message": "Message marked as read."})
     except Message.DoesNotExist:
         return JsonResponse({"success": False, "error": "Message not found or unauthorized access."}, status=404)
+
+@cache_page(60)  # Cache the view for 60 seconds
+def conversation_messages(request, conversation_id):
+    """
+    Retrieves a list of messages in a specific conversation.
+    """
+    conversation = get_object_or_404(Conversation, id=conversation_id)
+    messages = Message.objects.filter(conversation=conversation).order_by("timestamp")
+    
+    messages_data = [
+        {
+            "id": message.id,
+            "sender": message.sender.username,
+            "receiver": message.receiver.username,
+            "content": message.content,
+            "timestamp": message.timestamp.isoformat(),
+        }
+        for message in messages
+    ]
+    return JsonResponse({"conversation": conversation.id, "messages": messages_data})
