@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from .models import Message, Notification, MessageHistory
+import uuid
+from django.utils.timezone import now
 
 class NotificationSignalTestCase(TestCase):
     def setUp(self):
@@ -60,3 +62,17 @@ class UserDeletionTestCase(TestCase):
         self.assertEqual(Message.objects.filter(sender=self.user1).count(), 0)
         self.assertEqual(MessageHistory.objects.filter(message__sender=self.user1).count(), 0)
         self.assertEqual(Notification.objects.filter(user=self.user1).count(), 0)
+
+class ThreadedConversationTestCase(TestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user(username="user1", password="password")
+        self.user2 = User.objects.create_user(username="user2", password="password")
+
+        self.message1 = Message.objects.create(sender=self.user1, receiver=self.user2, content="Hello")
+        self.reply1 = Message.objects.create(sender=self.user2, receiver=self.user1, content="Hi!", parent_message=self.message1)
+        self.reply2 = Message.objects.create(sender=self.user1, receiver=self.user2, content="How are you?", parent_message=self.reply1)
+
+    def test_fetch_threaded_replies(self):
+        replies = fetch_threaded_replies(self.message1)
+        self.assertEqual(len(replies), 1)
+        self.assertEqual(len(replies[0]["replies"]), 1)  # Nested reply

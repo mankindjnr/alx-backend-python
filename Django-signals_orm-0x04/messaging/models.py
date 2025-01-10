@@ -9,12 +9,18 @@ class Message(models.Model):
     receiver = models.ForeignKey(User, related_name="received_messages", on_delete=models.CASCADE)
     content = models.TextField()
     timestamp = models.DateTimeField(default=now)
+    parent_message = models.ForeignKey(
+        "self", null=True, blank=True, related_name="replies", on_delete=models.CASCADE
+    )  # Self-referential FK for threaded replies
     edited = models.BooleanField(default=False)  # Track if the message has been edited
     edited_at = models.DateTimeField(null=True, blank=True)  # When the message was edited
     edited_by = models.ForeignKey(User, related_name="edited_messages", on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f"Message from {self.sender} to {self.receiver}"
+
+    class Meta:
+        ordering = ["-timestamp"] # Show the latest messages first - Ensures chronological order
 
 class Notification(models.Model):
     notification_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
