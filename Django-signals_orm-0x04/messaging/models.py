@@ -25,7 +25,7 @@ class Message(models.Model):
     edited_by = models.ForeignKey(User, related_name="edited_messages", on_delete=models.SET_NULL, null=True, blank=True)
 
     objects = models.Manager()
-    unread_messages = UnreadMessagesManager()
+    unread = UnreadMessagesManager()
 
     def __str__(self):
         return f"Message from {self.sender} to {self.receiver}"

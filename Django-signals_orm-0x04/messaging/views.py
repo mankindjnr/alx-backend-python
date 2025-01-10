@@ -115,6 +115,16 @@ def unread_messages(request):
     ]
     return JsonResponse({"unread_messages": messages_data})
 
+def unread_messages_view(request):
+    """
+    Display only unread messages for the logged-in user.
+    """
+    user = request.user
+    unread_messages = Message.unread.unread_for_user(user).only("id", "sender", "content", "timestamp")
+    context = {
+        "unread_messages": unread_messages
+    }
+    return render(request, "messaging/unread_messages.html", context)
 
 @csrf_exempt
 @login_required
