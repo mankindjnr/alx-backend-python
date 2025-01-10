@@ -1,6 +1,8 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Message, Notification, MessageHistory
+from django.db.models.signals import pre_save
+from django.utils.timezone import now
 
 @receiver(post_save, sender=Message)
 def create_notification(sender, instance, created, **kwargs):
@@ -24,5 +26,6 @@ def log_message_edit(sender, instance, **kwargs):
                 )
                 # Mark the message as edited
                 instance.edited = True
+                instance.edited_at = now()
         except Message.DoesNotExist:
             pass
