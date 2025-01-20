@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: messaging-app
-        image: ghcr.io/mankindjnr/alx-message-app:latest
+        image: ghcr.io/mankindjnr/alx-message-app:2.0
         ports:
         - containerPort: 8000
         env:
