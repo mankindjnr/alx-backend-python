@@ -9,7 +9,7 @@ services:
       - alx_message_net
 
   db:
-    image: postgres:latest
+    image: mysql:5.7
     container_name: messaging_db
     networks:
       - alx_message_net
