@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Step 1: Apply the updated blue deployment
+echo "Applying updated deployment..."
+kubectl apply -f blue_deployment.yaml
+
+# Step 2: Trigger a rolling update and monitor the progress
+echo "Monitoring rollout progress..."
+kubectl rollout status deployment/messaging-app-blue
+
+# Step 3: Test app for downtime
+echo "Testing app for downtime using curl..."
+SERVICE_IP=$(kubectl get svc messaging-app-service -o jsonpath='{.spec.clusterIP}')
+echo "Service IP: $SERVICE_IP"
+
+if [ -z "$SERVICE_IP" ]; then
+    echo "Service IP not found. Exiting..."
+    exit 1
+fi
+
+# Continuous curl requests to test downtime
+echo "Sending continuous requests..."
+for i in {1..30}; do
+    curl -s http://$SERVICE_IP:8000/api/health/ > /dev/null
+    if [ $? -ne 0 ]; then
+        echo "Request $i: Service is unavailable!"
+    else
+        echo "Request $i: Service is up."
+    fi
+    sleep 1
+done
+
+# Step 4: Verify the rolling update by listing pods
+echo "Verifying updated pods..."
+kubectl get pods -l app=messaging-app -l version=blue
