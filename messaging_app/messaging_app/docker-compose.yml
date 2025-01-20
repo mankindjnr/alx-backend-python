@@ -4,7 +4,7 @@ services:
       context: ./messaging_app
     container_name: messaging_app
     command: >
-      sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn messaging_app.wsgi:application --bind 0.0.0.0:8000"
+      sh -c "python manage.py migrate && python manage.py collectstatic --noinput && python3 manage.py runserver"
     networks:
       - alx_message_net
 
@@ -14,8 +14,15 @@ services:
     networks:
       - alx_message_net
     environment:
-      - POSTGRES_USER=alx
-      - POSTGRES_PASSWORD=alx
-      - POSTGRES_DB=alx_message
+      - MYSQL_USER=alx
+      - MYSQL_PASSWORD=alx
+      - MYSQL_DB=alx_message
     volumes:
       - alx_message_db:/var/lib/postgresql/data
+
+networks:
+  alx_message_net:
+    driver: bridge
+
+volumes:
+  alx_message_db:
