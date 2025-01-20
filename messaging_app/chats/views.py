@@ -106,3 +106,9 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class HealthCheckViewSet(viewsets.ViewSet):
+    permission_classes = [AllowAny]
+
+    def health(self, request):
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
