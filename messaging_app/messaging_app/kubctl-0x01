@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# scaling the deployment to 3 replicas
+kubectl scale deployment messaging-app-deployment --replicas=3
+
+kubectl get pods
+
+# forwarding the service name to the machine to make it accessible externally for testing
+kubectl port-forward service/messaging-app-external 8000:8000
+wrk -t4 -c100 -d30s http://localhost:8000
+
+# checking the resource usage of the pods
+kubectl top pods
