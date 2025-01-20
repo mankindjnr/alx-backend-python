@@ -1,43 +1,46 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: messaging-app-deployment
+  name: messaging-app-blue
   labels:
     app: messaging-app
+    version: blue
 spec:
-  replicas: 2  # Number of pods to run
+  replicas: 2
   selector:
     matchLabels:
       app: messaging-app
+      version: blue
   template:
     metadata:
       labels:
         app: messaging-app
+        version: blue
     spec:
       containers:
       - name: messaging-app
-        image: ghcr.io/mankindjnr/alx-message-app:latest  # Replace with your Docker image
+        image: ghcr.io/mankindjnr/alx-message-app:latest
         ports:
         - containerPort: 8000
         env:
         - name: DJANGO_SETTINGS_MODULE
           value: messaging_app.settings
         - name: DEBUG
-          value: "False"  # Ensure DEBUG is set to False in production
-        readinessProbe:  # Optional: Readiness probe for checking health
+          value: "False"
+        readinessProbe:
           httpGet:
             path: "/api/health/"
             port: 8000
           initialDelaySeconds: 5
           periodSeconds: 10
-        livenessProbe:  # Optional: Liveness probe
+        livenessProbe:
           httpGet:
             path: "/api/health/"
             port: 8000
           initialDelaySeconds: 10
           periodSeconds: 30
       imagePullSecrets:
-      - name: ghcr-regcred  # Secret for pulling image from GitHub Container Registry
+      - name: ghcr-regcred
 ---
 apiVersion: v1
 kind: Service
@@ -49,6 +52,7 @@ spec:
   type: ClusterIP
   selector:
     app: messaging-app
+    version: blue
   ports:
   - port: 8000
     targetPort: 8000
