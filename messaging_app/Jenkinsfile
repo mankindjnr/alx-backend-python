@@ -2,7 +2,10 @@ pipeline {
     agent any
 
     environment {
-        GITHUB_CREDENTIALS = 'github-credentials' // Use the ID you created earlier
+        GITHUB_CREDENTIALS = 'github-credentials' // Replace with your GitHub credentials ID
+        DOCKER_CREDENTIALS = 'github-credentials' // Replace with your Docker Hub credentials ID
+        DOCKER_IMAGE = 'ghcr.io/mankinndjnr/alx-message-app' // Replace with your Docker Hub repository name
+        DOCKER_TAG = 'latest' // Tag for the Docker image
     }
 
     stages {
@@ -26,16 +29,25 @@ pipeline {
             }
         }
 
-        stage('Publish Test Report') {
+        stage('Build Docker Image') {
             steps {
-                publishHTML(target: [
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: '.',
-                    reportFiles: 'report.xml',
-                    reportName: 'Test Report'
-                ])
+                script {
+                    sh """
+                    docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                    """
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh """
+                    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                    docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    docker logout
+                    """
+                }
             }
         }
     }
@@ -43,6 +55,12 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: 'report.xml', fingerprint: true
+        }
+        success {
+            echo 'Pipeline completed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }
