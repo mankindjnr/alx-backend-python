@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+
+    environment {
+        GITHUB_CREDENTIALS = 'github-credentials' // Use the ID you created earlier
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main',
+                    credentialsId: env.GITHUB_CREDENTIALS,
+                    url: 'https://github.com/mankindjnr/alx-backend-python.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'pip install -r requirements.txt'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'pytest --junitxml=report.xml'
+            }
+        }
+
+        stage('Publish Test Report') {
+            steps {
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: '.',
+                    reportFiles: 'report.xml',
+                    reportName: 'Test Report'
+                ])
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'report.xml', fingerprint: true
+        }
+    }
+}
